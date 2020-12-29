@@ -81,7 +81,8 @@ class _ImageCaptureState extends State<ImageCapture> {
                   iconSize: 40,
                 ),
               ],
-            )),
+            )
+        ),
         body: (isLoading)?Align(
             alignment: Alignment.center,
             child: Container(

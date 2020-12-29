@@ -91,7 +91,7 @@ class _ChatAreaState extends State<ChatArea> {
                           ]),
                         ),
                         child: Icon(
-                          Icons.add_a_photo_sharp,
+                          Icons.note_add_rounded,
                           size: 28.0,
                           color: Colors.blue,
                         ),

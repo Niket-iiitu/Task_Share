@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:prototype4/helper/authenticate.dart';
 import 'package:prototype4/pages/search.dart';
+import 'package:prototype4/pages/taskPage.dart';
 import 'package:prototype4/services/auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:prototype4/services/database.dart';
@@ -41,6 +42,7 @@ class _ChatRoomState extends State<ChatRoom> {
       child: Container(
           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -87,13 +89,46 @@ class _ChatRoomState extends State<ChatRoom> {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SearchScreen()));
-        },
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(8.0),
+                child: FloatingActionButton(
+                  heroTag: null,
+                  backgroundColor: Colors.greenAccent[700],
+                  child: Icon(Icons.library_add_check_outlined),
+                  onPressed: (){
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => TaskScreen()));
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(8.0),
+                child: FloatingActionButton(
+                  heroTag: null,
+                  backgroundColor: Colors.orange[800],
+                  child: Icon(Icons.person_add_rounded),
+                  onPressed: () {
+                    Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => SearchScreen()));
+                    },
+                ),
+              ),
+            ]
+          ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //         backgroundColor: Colors.orange[800],
+      //         child: Icon(Icons.person_add_rounded),
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context, MaterialPageRoute(builder: (context) => SearchScreen()));
+      //           },
+      //       ),
       body: isLoading
           ? Align(
             alignment: Alignment.center,
