@@ -18,17 +18,22 @@ class ImageCapture extends StatefulWidget {
 }
 
 class _ImageCaptureState extends State<ImageCapture> {
-  List<File> file = new List<File>();
+  // List<File> file = new List<File>();
+  List<String> name = new List<String>();
   List<PlatformFile> platformFile = new List<PlatformFile>();
+  TextEditingController fileName = new TextEditingController();
+  bool isLoading=false;
 
   getFile() async {
     FilePickerResult result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if(result != null) {
       setState(() {
-        file = result.paths.map((path) => File(path)).toList();
-        print("getFile file: ${file.length}");
-        platformFile = result.files.toList();
-        print("getFile PlatformFile: ${platformFile.length}");
+        //file = result.paths.map((path) => File(path)).toList();
+        //print("getFile file: ${file.length}");
+        platformFile.addAll(result.files.toList());
+        name=new List<String>();
+        for(int i=0;i<platformFile.length;i++) {name.add(platformFile[i].name);}
+        print("getFile PlatformFile: ${platformFile.length} name:${name.length}");
       });
     } else {
       print("takeImage: No file Taken");
@@ -38,11 +43,15 @@ class _ImageCaptureState extends State<ImageCapture> {
   sendFile() async {
     if(platformFile!=null){
       ChatListMessage chatListMessage = new ChatListMessage();
-      for(int i=0;i<platformFile.length;i++){
-        String url = await chatListMessage.uploadFile(File(platformFile[i].path));
-        await chatListMessage.sendFile(url, widget.friendCredential);
+      isLoading=true;
+      for(int i=0;i<platformFile.length;i++) {
+        await chatListMessage.uploadFile(File(platformFile[i].path)).then((
+            url) async {
+          await chatListMessage.sendFile(
+              url.toString(), name[i], widget.friendCredential);
+        });
       }
-      Navigator.of(context).pop();
+      isLoading=false;
     }
   }
 
@@ -73,15 +82,19 @@ class _ImageCaptureState extends State<ImageCapture> {
                 ),
               ],
             )),
-        body: (
-            ListView.builder(
+        body: (isLoading)?Align(
+            alignment: Alignment.center,
+            child: Container(
+              child: CircularProgressIndicator(),
+            ),
+          ):ListView.builder(
               shrinkWrap: true,
               itemCount: platformFile.length,
               itemBuilder: (context,index){
                 return fileTile(platformFile[index],index);
               },
             )
-        )
+
     );
   }
 
@@ -104,13 +117,13 @@ class _ImageCaptureState extends State<ImageCapture> {
             onPressed:(){
               showDialog(
                   context: context,
-                  builder: (context) => showImage(File(data.path))
+                  builder: (context) => showImage(File(data.path),index)
               );
             },
             child:Container(
               padding: EdgeInsets.all(5),
               child: Text(
-              data.name,
+              name[index],
               maxLines: 1,
               style: TextStyle(
                 color: Colors.white,
@@ -140,23 +153,40 @@ class _ImageCaptureState extends State<ImageCapture> {
     );
   }
 
-  AlertDialog showImage(File file) {
+  AlertDialog showImage(File file,int index) {
     return new AlertDialog(
-      title: Column(children: [
-        Container(
-          child: Text(
-            "Preview",
-            style: whiteStyleW(context),
+      title: SingleChildScrollView(
+        child: Column(children: [
+          // Container(
+          //   child: Text(
+          //     "Preview",
+          //     style: whiteStyleW(context),
+          //   ),
+          //   padding: EdgeInsets.all(8.0),
+          // ),
+          Center(
+            child: Column(
+              children: [
+                Image.file(
+                  file,
+                  fit: BoxFit.cover,
+                  height: 250,
+                  width: 200,
+                ),
+                Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: alertInput(context, platformFile[index].name),
+                    style: amberStyle(context),
+                    textAlign: TextAlign.center,
+                    controller: fileName,
+                  ),
+                )
+              ],
+            ),
           ),
-          padding: EdgeInsets.all(8.0),
-        ),
-        Center(
-          child: Image.file(
-            file,
-            fit: BoxFit.cover,
-          ),
-        ),
-      ]),
+        ]),
+      ),
       backgroundColor: Colors.black,
       actions: [
         RaisedButton(
@@ -168,7 +198,29 @@ class _ImageCaptureState extends State<ImageCapture> {
             color: Colors.transparent,
             child: Text(
               "Close",
-              style: whiteStyleS(context),
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
+            )),
+        RaisedButton(
+            onPressed: (() {
+              setState(() {
+                if(fileName.text.trim().length>2)name[index] = fileName.text.trim();
+              });
+              Navigator.of(context).pop();
+            }),
+            elevation: 2.0,
+            //highlightColor: Colors.white54,
+            color: Colors.transparent,
+            child: Text(
+              "OK",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
             )),
       ],
     );

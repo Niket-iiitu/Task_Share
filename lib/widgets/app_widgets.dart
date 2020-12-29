@@ -27,6 +27,19 @@ InputDecoration fieldInput(BuildContext context, String hint) {
   );
 }
 
+InputDecoration alertInput(BuildContext context, String hint) {
+  return InputDecoration(
+    hintText: hint,
+    hintStyle: TextStyle(
+      color: Colors.white54,
+    ),
+    focusedBorder:
+    UnderlineInputBorder(borderSide: BorderSide(color: Colors.amber[600])),
+    enabledBorder:
+    UnderlineInputBorder(borderSide: BorderSide(color: Colors.white54)),
+  );
+}
+
 TextStyle whiteStyle(BuildContext context) {
   return TextStyle(
     color: Colors.white70,
@@ -81,6 +94,13 @@ TextStyle blackStyle(BuildContext context) {
 TextStyle blueStyle(BuildContext context) {
   return TextStyle(
     color: Colors.blueAccent[400],
+    fontWeight: FontWeight.bold,
+  );
+}
+
+TextStyle amberStyle(BuildContext context) {
+  return TextStyle(
+    color: Colors.amber,
     fontWeight: FontWeight.bold,
   );
 }

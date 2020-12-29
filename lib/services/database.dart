@@ -127,6 +127,7 @@ class ChatListMessage {
               sender: 'friend',
               text: values['text'].toString(),
               type: values['type'].toString());
+          print("GetMessage Scanner: ${values['text'].toString()}");
         }
         if (values['receiever'].toString() == friendCredential &&
             values['sender'].toString() == meCredential) {
@@ -135,6 +136,7 @@ class ChatListMessage {
               sender: 'me',
               text: values['text'].toString(),
               type: values['type'].toString());
+          print("GetMessage Scanner: ${values['text'].toString()}");
         }
       });
     });
@@ -142,7 +144,7 @@ class ChatListMessage {
       ..sort()).reversed.toList();
     for (int i = 0; i < sortedKeys.length; i++) {
       finalData.add(chats[sortedKeys[i]]);
-      print("database: ${finalData[i].getSender()} ${finalData[i].getType()}");
+      //print("database: ${finalData[i].getSender()} ${finalData[i].getType()} ${finalData[i].getText()}");
     }
     return finalData;
   }
@@ -159,17 +161,16 @@ class ChatListMessage {
     }
   }
 
-  sendFile(String url, String friendCredential) async {
-    String name = getDateTime();
+  sendFile(String url, String name, String friendCredential) async {
     await FirebaseDatabase.instance
         .reference()
         .child('chats')
-        .child(name)
+        .child(getDateTime())
         .set({
       'sender': meCredential,
-      'reciever': friendCredential,
+      'receiever': friendCredential,
       'text': url,
-      'type': name + " TaskShare",
+      'type': name ,
     });
   }
 }
