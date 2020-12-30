@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:prototype4/pages/takeImage.dart';
 import 'package:prototype4/services/user.dart';
@@ -41,7 +42,31 @@ class _ChatAreaState extends State<ChatArea> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: chatAppBar(context, widget.friendName, widget.friendPosition),
+      //appBar: chatAppBar(context, widget.friendName, widget.friendPosition)
+     appBar: AppBar(
+                title: Text(widget.friendName + "(" +  widget.friendPosition + ")",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+       backgroundColor: Colors.blue[600],
+       actions: [
+         GestureDetector(
+           onTap: (){
+             showDialog(
+                 context: context,
+                 builder: (context) => taskDialog());
+           },
+           child: Container(
+             padding: EdgeInsets.all(8.0),
+             child: Icon(
+               Icons.design_services
+             ),
+           ),
+         )
+       ],
+      ),
       body: Align(
         alignment: Alignment.center,
         child: Column(
@@ -362,4 +387,64 @@ class _ChatAreaState extends State<ChatArea> {
     );
   }
 
+  AlertDialog taskDialog(){
+    return new AlertDialog(
+      backgroundColor: Colors.blueGrey[600],
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Assign Task",
+            style: whiteStyleW(context),
+            textAlign: TextAlign.center,
+          ),
+          TextField(
+            decoration: alertInput(context, "Title"),
+            style: amberStyle(context),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8.0,),
+          TextField(
+            decoration: fieldInput(context, "Details"),
+            style: blueStyle(context),
+            textAlign: TextAlign.justify,
+            maxLines: 5,
+          )
+        ],
+      ),
+      actions: [
+        RaisedButton(
+            onPressed: (() {
+              Navigator.of(context).pop();
+            }),
+            elevation: 2.0,
+            //highlightColor: Colors.white54,
+            color: Colors.transparent,
+            child: Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
+            )),
+        RaisedButton(
+            onPressed: (() {
+              //add task
+              Navigator.of(context).pop();
+            }),
+            elevation: 2.0,
+            //highlightColor: Colors.white54,
+            color: Colors.transparent,
+            child: Text(
+              "Send",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
+            )),
+      ],
+    );
+  }
 }

@@ -12,20 +12,55 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: mainAppBar(context),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.black,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            bottomTile(taskLeft, Colors.purple[600], "Left"),
-            bottomTile(taskInProcess, Colors.green, "Underway"),
-            bottomTile(taskStall, Colors.red , "Stalled"),
-          ],
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Task Share",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            backgroundColor: Colors.blue[600],
+            bottom: TabBar(
+
+              indicator: BoxDecoration(
+                color: Colors.lightBlue
+              ),
+              //isScrollable: true,
+              tabs: <Widget>[
+                Tab(
+                  text: "Pending",
+                ),
+                Tab(
+                  text: "Underway",
+                ),
+                Tab(
+                  text: "Halted",
+                )
+              ],
+            ),
+          ),
+          body: TabBarView(children: [
+            Container(child: Text("Pending"),),
+            Container(child: Text("Underway"),),
+            Container(child: Text("Halted"),),
+          ],),
+          bottomNavigationBar: BottomAppBar(
+            color: Colors.black,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                bottomTile(taskLeft, Colors.purple[600], "Left"),
+                bottomTile(taskInProcess, Colors.green, "Underway"),
+                bottomTile(taskStall, Colors.red , "Stalled"),
+              ],
+            ),
+          )
+
         ),
-      ),
-      body: Container(),
     );
   }
 
