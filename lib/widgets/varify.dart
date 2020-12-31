@@ -19,3 +19,10 @@ String emailVal(String val) {
 String passwordVal(String val) {
   return val.length > 6 ? null : "Password must have 6+ characters.";
 }
+
+String titleVal(String val) {
+  val=val.trim();
+  return val.isEmpty || val.length < 3
+      ? "Title must have at least 3 characters"
+      : null;
+}

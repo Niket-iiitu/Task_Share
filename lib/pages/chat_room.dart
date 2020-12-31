@@ -11,10 +11,12 @@ import 'package:prototype4/pages/takeImage.dart';
 import 'package:prototype4/services/user.dart';
 import 'package:prototype4/widgets/app_widgets.dart';
 import 'package:prototype4/services/database.dart';
+import 'package:prototype4/widgets/varify.dart';
 
 //Message exchange goes here
 class ChatArea extends StatefulWidget {
   final String friendName, friendPosition, friendCredential;
+
   ChatArea(
       {Key key, this.friendName, this.friendPosition, this.friendCredential})
       : super(key: key);
@@ -23,7 +25,11 @@ class ChatArea extends StatefulWidget {
 }
 
 class _ChatAreaState extends State<ChatArea> {
+  //TODO: Global Variables
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController messageController = new TextEditingController();
+  TextEditingController titleController = new TextEditingController();
+  TextEditingController descriptionController = new TextEditingController();
 
   List<textData> finalData = new List<textData>();
 
@@ -182,7 +188,7 @@ class _ChatAreaState extends State<ChatArea> {
     );
   }
 
-  Widget chatListBuild() {
+  Widget chatListBuild() { //TODO: List Builder
     return finalData.isEmpty
         ? Container()
         : ListView.builder(
@@ -329,7 +335,7 @@ class _ChatAreaState extends State<ChatArea> {
           );
   }
 
-  AlertDialog showImage(String url) {
+  AlertDialog showImage(String url) { //TODO: Show Image Alert Dialog
     return new AlertDialog(
       title: Column(children: [
         Container(
@@ -387,30 +393,36 @@ class _ChatAreaState extends State<ChatArea> {
     );
   }
 
-  AlertDialog taskDialog(){
+  AlertDialog taskDialog(){ //TODO: Task Alert Dialog
     return new AlertDialog(
       backgroundColor: Colors.blueGrey[600],
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            "Assign Task",
-            style: whiteStyleW(context),
-            textAlign: TextAlign.center,
-          ),
-          TextField(
-            decoration: alertInput(context, "Title"),
-            style: amberStyle(context),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 8.0,),
-          TextField(
-            decoration: fieldInput(context, "Details"),
-            style: blueStyle(context),
-            textAlign: TextAlign.justify,
-            maxLines: 5,
-          )
-        ],
+      title: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "Assign Task",
+              style: whiteStyleW(context),
+              textAlign: TextAlign.center,
+            ),
+            TextFormField(
+              decoration: alertInput(context, "Title"),
+              style: amberStyle(context),
+              textAlign: TextAlign.center,
+              validator: (val) => titleVal(val),
+              controller: titleController,
+            ),
+            SizedBox(height: 8.0,),
+            TextField(
+              decoration: fieldInput(context, "Details"),
+              style: blueStyle(context),
+              textAlign: TextAlign.justify,
+              maxLines: 5,
+              controller: descriptionController,
+            )
+          ],
+        ),
       ),
       actions: [
         RaisedButton(
@@ -430,8 +442,11 @@ class _ChatAreaState extends State<ChatArea> {
             )),
         RaisedButton(
             onPressed: (() {
-              //add task
-              Navigator.of(context).pop();
+              if(_formKey.currentState.validate()){
+                TaskMessages taskMessages = new TaskMessages();
+                taskMessages.assignTask(titleController.text.trim(), descriptionController.text.trim(), widget.friendCredential);
+                Navigator.of(context).pop();
+              }
             }),
             elevation: 2.0,
             //highlightColor: Colors.white54,

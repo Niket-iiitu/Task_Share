@@ -29,6 +29,41 @@ class textData {
   }
 }
 
+class taskData{
+  final String description;
+  final String key;
+  final String receiver;
+  final String sender;
+  final String title;
+  final String status;
+
+  taskData({this.description, this.key, this.receiver, this.sender, this.title,this.status});
+
+  String getDescription(){
+    return description;
+  }
+
+  String getKey(){
+    return key;
+  }
+
+  String getReceiver(){
+    return receiver;
+  }
+
+  String getSender(){
+    return sender;
+  }
+
+  String getTitle(){
+    return title;
+  }
+
+  String getStatus(){
+    return status;
+  }
+}
+
 // class chatsData {
 //   final String key;
 //   final textData data;

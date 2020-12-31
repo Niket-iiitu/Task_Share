@@ -17,7 +17,7 @@ import 'dart:convert';
 
 class DatabaseMethods {
   final databaseReference = FirebaseDatabase.instance.reference();
-  getUserByUsername(String username) async {
+  getUserByUsername(String username) async { //TODO Search User
     Map<int, Map<String, String>> friends = new Map();
     int position = 0;
     await databaseReference.child("users").once().then((DataSnapshot snapshot) {
@@ -49,7 +49,7 @@ class DatabaseMethods {
   }
 }
 
-Future<void> AddFriend(
+Future<void> AddFriend( //TODO Add Friends
     String friendCredential, String name, String position) async {
   Firebase.initializeApp();
   String currentUser = FirebaseAuth.instance.currentUser.uid.toString();
@@ -70,7 +70,7 @@ Future<void> AddFriend(
 }
 
 class AccessFriends {
-  GetFriends() async {
+  GetFriends() async { //TODO get Friends
     final Map<String, Map<String, String>> data =
         new Map<String, Map<String, String>>();
     await FirebaseDatabase.instance
@@ -96,7 +96,7 @@ class AccessFriends {
 class ChatListMessage {
   String meCredential = FirebaseAuth.instance.currentUser.uid.toString();
 
-  sendMessage(String message, String friendCredential) async {
+  sendMessage(String message, String friendCredential) async { //TODO send Messages
     await FirebaseDatabase.instance
         .reference()
         .child('chats')
@@ -109,7 +109,7 @@ class ChatListMessage {
     });
   }
 
-  GetMessages(String friendCredential) async {
+  GetMessages(String friendCredential) async { //TODO get Messages
     final List<textData> finalData = new List<textData>();
     final Map<String, textData> chats = new Map<String, textData>();
     await FirebaseDatabase.instance
@@ -149,7 +149,7 @@ class ChatListMessage {
     return finalData;
   }
 
-  uploadFile(File file) async {
+  uploadFile(File file) async { //TODO upload File
     try {
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference reference = storage.ref().child(getDateTime());
@@ -161,7 +161,7 @@ class ChatListMessage {
     }
   }
 
-  sendFile(String url, String name, String friendCredential) async {
+  sendFile(String url, String name, String friendCredential) async { //TODO send File
     await FirebaseDatabase.instance
         .reference()
         .child('chats')
@@ -175,7 +175,7 @@ class ChatListMessage {
   }
 }
 
-String getDateTime() {
+String getDateTime() { //TODO get Date And Time
   String day = DateTime.now().day.toString().padLeft(2, '0');
   print(day);
 
@@ -206,8 +206,80 @@ String getDateTime() {
   return dateTime;
 }
 
-downloadImageFromURL(String url) async {
+downloadImageFromURL(String url) async { //TODO Download file from URL
   var response = await http.get(url);
   var filePath = await ImagePickerSaver.saveFile(fileData: response.bodyBytes);
   print(filePath);
+}
+
+class TaskMessages{
+  String meCredential = FirebaseAuth.instance.currentUser.uid.toString();
+  assignTask(String title,String description,String friendCredential) async { //TODO Assign Task
+    String dateTime = getDateTime();
+    await FirebaseDatabase.instance.reference().child('task').child(dateTime).set({
+      'sender':meCredential,
+      'receiver':friendCredential,
+      'title':title,
+      'description':description,
+      'status':'pending',
+      'key':dateTime,
+    });
+    messageTask(friendCredential, title,'Pending', dateTime);
+  }
+
+  messageTask(String friendCredential,String title,String status,String dateTime) async { //TODO Message Task
+    await FirebaseDatabase.instance.reference().child('chats').child(dateTime).set({
+      'sender': meCredential,
+      'receiever': friendCredential,
+      'text': "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute} $title $status",
+      'type': 'task',
+    });
+  }
+  
+  updateTask(String key,String newStatus,String title,String friendCredential) async { //TODO: Update Task
+    await FirebaseDatabase.instance.reference().child('task').child(key).child('status').set(newStatus);
+    await messageTask(friendCredential, title, newStatus, getDateTime());
+  }
+  
+  getName(String credential) async { //TODO: Get Name of Sender
+    await FirebaseDatabase.instance.reference().child('users').child(credential).once().then((value){
+      return value.toString();
+    });
+  }
+
+  getTask() async {
+    //TODO: Get Task
+    final Map<String, taskData> unit = new Map<String, taskData>();
+    final List<taskData> data = new List<taskData>();
+    await FirebaseDatabase.instance
+        .reference()
+        .child('chats')
+        .once()
+        .then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key, values) {
+        if (values['receiver'] == meCredential) {
+          unit[key.toString()] = taskData(
+            description: values['description'].toString(),
+            key: values['key'].toString(),
+            receiver: values['receiver'].toString(),
+            sender: values['sender'].toString(),
+            status: values['status'].toString(),
+            title: values['title'].toString(),
+          );
+        }
+      });
+    });
+    var sortedKeys = (unit.keys.toList()
+      ..sort()).reversed.toList();
+    for (int i = 0; i < sortedKeys.length; i++) {
+      data.add(unit[sortedKeys[i]]);
+      return data;
+    }
+  }
+  
+  removeTask(String key,String title,String friendCredential) async {
+    await FirebaseDatabase.instance.reference().child('task').child(key).set(null);
+    await messageTask(friendCredential, title, 'Canceled', getDateTime());
+  }
 }
