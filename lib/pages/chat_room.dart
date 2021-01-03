@@ -49,29 +49,29 @@ class _ChatAreaState extends State<ChatArea> {
   Widget build(BuildContext context) {
     return Scaffold(
       //appBar: chatAppBar(context, widget.friendName, widget.friendPosition)
-     appBar: AppBar(
-                title: Text(widget.friendName + "(" +  widget.friendPosition + ")",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-       backgroundColor: Colors.blue[600],
-       actions: [
-         GestureDetector(
-           onTap: (){
-             showDialog(
-                 context: context,
-                 builder: (context) => taskDialog());
-           },
-           child: Container(
-             padding: EdgeInsets.all(8.0),
-             child: Icon(
-               Icons.design_services
-             ),
-           ),
-         )
-       ],
+      appBar: AppBar(
+        title: Text(widget.friendName + "(" +  widget.friendPosition + ")",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.blue[600],
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                  context: context,
+                  builder: (context) => taskDialog());
+            },
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                  Icons.design_services
+              ),
+            ),
+          )
+        ],
       ),
       body: Align(
         alignment: Alignment.center,
@@ -81,105 +81,103 @@ class _ChatAreaState extends State<ChatArea> {
               child: FutureBuilder(
                 future: getmessages(widget.friendCredential),
                 builder: (BuildContext ctx, snapshot) =>
-                    snapshot.connectionState == ConnectionState.waiting
-                        ? Align(
-                            alignment: Alignment.center,
-                            child: Container(
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : SafeArea(child: chatListBuild()),
+                snapshot.connectionState == ConnectionState.waiting
+                    ? Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+                    : chatListBuild(),
               ),
             ),
-            SafeArea(
-              child: Container(
-                alignment: Alignment.bottomCenter,
-                width: MediaQuery.of(context).size.width,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      height: 10.0,
-                      width: 8.0,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ImageCapture(
-                                      friendCredential: widget.friendCredential,
-                                    )));
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          gradient: LinearGradient(colors: [
-                            const Color(0x0FFFFFFF),
-                            const Color(0x36FFFFFF)
-                          ]),
-                        ),
-                        child: Icon(
-                          Icons.note_add_rounded,
-                          size: 28.0,
-                          color: Colors.blue,
-                        ),
+            Container(
+              alignment: Alignment.bottomCenter,
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    height: 10.0,
+                    width: 8.0,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ImageCapture(
+                                friendCredential: widget.friendCredential,
+                              )));
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        gradient: LinearGradient(colors: [
+                          const Color(0x0FFFFFFF),
+                          const Color(0x36FFFFFF)
+                        ]),
+                      ),
+                      child: Icon(
+                        Icons.note_add_rounded,
+                        size: 28.0,
+                        color: Colors.blue,
                       ),
                     ),
-                    SizedBox(
-                      height: 10.0,
-                      width: 10.0,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                    width: 10.0,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      style: whiteStyle(context),
+                      decoration: fieldInput(context, "Message"),
+                      controller: messageController,
                     ),
-                    Expanded(
-                      child: TextField(
-                        style: whiteStyle(context),
-                        decoration: fieldInput(context, "Message"),
-                        controller: messageController,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                    width: 10.0,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      ChatListMessage chatListMessage = new ChatListMessage();
+                      if (messageController.text.trim().isNotEmpty) {
+                        chatListMessage.sendMessage(
+                            messageController.text.trim(),
+                            widget.friendCredential);
+                      }
+                      messageController.clear();
+                      FocusScopeNode currentFocus = FocusScope.of(context); //Minimize keyboard on press
+                      if (!currentFocus.hasPrimaryFocus) {
+                        currentFocus.unfocus();
+                      }
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        gradient: LinearGradient(colors: [
+                          const Color(0x36FFFFFF),
+                          const Color(0x0FFFFFFF)
+                        ]),
+                      ),
+                      child: Icon(
+                        Icons.send_rounded,
+                        size: 28.0,
+                        color: Colors.blue,
                       ),
                     ),
-                    SizedBox(
-                      height: 10.0,
-                      width: 10.0,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        ChatListMessage chatListMessage = new ChatListMessage();
-                        if (messageController.text.trim().isNotEmpty) {
-                          chatListMessage.sendMessage(
-                              messageController.text.trim(),
-                              widget.friendCredential);
-                        }
-                        messageController.clear();
-                        FocusScopeNode currentFocus = FocusScope.of(context); //Minimize keyboard on press
-                        if (!currentFocus.hasPrimaryFocus) {
-                          currentFocus.unfocus();
-                        }
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          gradient: LinearGradient(colors: [
-                            const Color(0x36FFFFFF),
-                            const Color(0x0FFFFFFF)
-                          ]),
-                        ),
-                        child: Icon(
-                          Icons.send_rounded,
-                          size: 28.0,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                      width: 8.0,
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                    width: 8.0,
+                  ),
+                ],
               ),
             )
           ],
@@ -192,147 +190,158 @@ class _ChatAreaState extends State<ChatArea> {
     return finalData.isEmpty
         ? Container()
         : ListView.builder(
-            dragStartBehavior: DragStartBehavior.start,
-            reverse: true,
-            itemCount: finalData.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              print(
-                  "chatListBuilder ${finalData[index].getSender()} at index $index");
-              print("type: ${finalData[index].getType()}");
-              if (finalData[index].getType() == 'text') {
-                return (finalData[index].getSender() == 'friend')
-                    ? Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 20.0,
-                            ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              child: FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Text(
-                                  finalData[index].getText(),
-                                  style: chatStyle(context),
-                                ),
-                              ),
-                              decoration: leftChatBox(),
-                              padding: EdgeInsets.all(12),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              alignment: Alignment.centerRight,
-                              child: FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Text(
-                                  finalData[index].getText(),
-                                  style: chatStyle(context),
-                                ),
-                              ),
-                              decoration: rightChatBox(),
-                              padding: EdgeInsets.all(12),
-                            ),
-                            SizedBox(
-                              width: 10.0,
-                            ),
-                          ],
-                        ),
-                      );
-              } else{
-                return (finalData[index].getSender() == 'friend')
-                    ? Row(
+      dragStartBehavior: DragStartBehavior.start,
+      reverse: true,
+      itemCount: finalData.length,
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        print(
+            "chatListBuilder ${finalData[index].getSender()} at index $index");
+        print("type: ${finalData[index].getType()}");
+        if (finalData[index].getType() == 'text') {
+          return (finalData[index].getSender() == 'friend')
+              ? Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 20.0,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      finalData[index].getText(),
+                      style: chatStyle(context),
+                    ),
+                  ),
+                  decoration: leftChatBox(),
+                  padding: EdgeInsets.all(12),
+                ),
+              ],
+            ),
+          )
+              : Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      finalData[index].getText(),
+                      style: chatStyle(context),
+                    ),
+                  ),
+                  decoration: rightChatBox(),
+                  padding: EdgeInsets.all(12),
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+              ],
+            ),
+          );
+        } else{
+          return (finalData[index].getSender() == 'friend')
+              ? Container(
+                child: Row(
+            children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 12, horizontal: 20),
+                  child: GestureDetector(
+                    onTap: (() {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              showImage(finalData[index].text));
+                    }),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 20),
-                            child: GestureDetector(
-                              onTap: (() {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) =>
-                                        showImage(finalData[index].text));
-                              }),
-                              child: Container(
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        finalData[index].getType(),
-                                        style: imageStyle(context),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.download_outlined,
-                                      size: 25,
-                                      color: Colors.blue,
-                                    ),
-                                  ],
-                                ),
-                                decoration: leftChatBox(),
-                                padding: EdgeInsets.all(12),
-                              ),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              finalData[index].getType(),
+                              style: imageStyle(context),
                             ),
                           ),
-                          SizedBox(
-                            width: 10.0,
+                          Icon(
+                            Icons.download_outlined,
+                            size: 25,
+                            color: Colors.blue,
                           ),
                         ],
-                      )
-                    : Row(
+                      ),
+                      decoration: leftChatBox(),
+                      padding: EdgeInsets.all(12),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+            ],
+          ),
+          ) : Container(
+                child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+                SizedBox(
+                  width: 10.0,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 8, horizontal: 10),
+                  child: GestureDetector(
+                    onTap: (() {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              showImage(finalData[index].text));
+                    }),
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SizedBox(
-                            width: 10.0,
+                          Icon(
+                            Icons.download_outlined,
+                            size: 25,
+                            color: Colors.amberAccent,
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 10),
-                            child: GestureDetector(
-                              onTap: (() {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) =>
-                                        showImage(finalData[index].text));
-                              }),
-                              child: Container(
-                                alignment: Alignment.centerRight,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      Icons.download_outlined,
-                                      size: 25,
-                                      color: Colors.amberAccent,
-                                    ),
-                                    Text(
-                                      finalData[index].getType(),
-                                      style: imageStyle(context),
-                                    ),
-                                  ],
-                                ),
-                                decoration: rightChatBox(),
-                                padding: EdgeInsets.all(12),
-                              ),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              finalData[index].getType(),
+                              style: imageStyle(context),
                             ),
                           ),
                         ],
-                      );
-              }
-              return Container();
-            },
-          );
+                      ),
+                      decoration: rightChatBox(),
+                      padding: EdgeInsets.all(12),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+              );
+        }
+        return Container();
+      },
+    );
   }
 
   AlertDialog showImage(String url) { //TODO: Show Image Alert Dialog
@@ -357,7 +366,7 @@ class _ChatAreaState extends State<ChatArea> {
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes
+                    loadingProgress.expectedTotalBytes
                     : null,
               ),
             );

@@ -242,8 +242,15 @@ class TaskMessages{
   }
   
   getName(String credential) async { //TODO: Get Name of Sender
-    await FirebaseDatabase.instance.reference().child('users').child(credential).once().then((value){
-      return value.toString();
+    await FirebaseDatabase.instance.reference().child('users').child(credential).once().then((DataSnapshot snapshot){
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key, values) {
+        if(key.toString()=='name'){
+          String res= values.toString();
+          print("getName $res");
+          return res;
+        }
+      });
     });
   }
 
@@ -253,12 +260,13 @@ class TaskMessages{
     final List<taskData> data = new List<taskData>();
     await FirebaseDatabase.instance
         .reference()
-        .child('chats')
+        .child('task')
         .once()
         .then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key, values) {
-        if (values['receiver'] == meCredential) {
+        print("getTask ${key.toString()}");
+        if (values['receiver'].toString() == meCredential) {
           unit[key.toString()] = taskData(
             description: values['description'].toString(),
             key: values['key'].toString(),
@@ -270,12 +278,15 @@ class TaskMessages{
         }
       });
     });
+    print("getTask unit:${unit.length}");
     var sortedKeys = (unit.keys.toList()
       ..sort()).reversed.toList();
     for (int i = 0; i < sortedKeys.length; i++) {
       data.add(unit[sortedKeys[i]]);
-      return data;
     }
+    print("getTask data: ${data.length}");
+    List<taskData> finalData = data;
+    return finalData;
   }
   
   removeTask(String key,String title,String friendCredential) async {
