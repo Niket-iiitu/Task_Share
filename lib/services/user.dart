@@ -36,8 +36,9 @@ class taskData{
   final String sender;
   final String title;
   final String status;
+  final String name;
 
-  taskData({this.description, this.key, this.receiver, this.sender, this.title,this.status});
+  taskData({this.description, this.key, this.receiver, this.sender, this.title,this.status,this.name});
 
   String getDescription(){
     return description;
@@ -61,6 +62,10 @@ class taskData{
 
   String getStatus(){
     return status;
+  }
+
+  String getName(){
+    return name;
   }
 }
 

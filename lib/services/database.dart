@@ -214,8 +214,15 @@ downloadImageFromURL(String url) async { //TODO Download file from URL
 
 class TaskMessages{
   String meCredential = FirebaseAuth.instance.currentUser.uid.toString();
+
   assignTask(String title,String description,String friendCredential) async { //TODO Assign Task
     String dateTime = getDateTime();
+    String meName;
+    await FirebaseDatabase.instance.reference().child('users').child(meCredential).child('name').once().then(
+        (DataSnapshot dataSnapshot){
+          meName=dataSnapshot.value.toString();
+        }
+    );
     await FirebaseDatabase.instance.reference().child('task').child(dateTime).set({
       'sender':meCredential,
       'receiver':friendCredential,
@@ -223,6 +230,7 @@ class TaskMessages{
       'description':description,
       'status':'pending',
       'key':dateTime,
+      'name':meName,
     });
     messageTask(friendCredential, title,'Pending', dateTime);
   }
@@ -243,6 +251,7 @@ class TaskMessages{
   
   getName(String credential) async { //TODO: Get Name of Sender
     await FirebaseDatabase.instance.reference().child('users').child(credential).once().then((DataSnapshot snapshot){
+      print(credential);
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key, values) {
         if(key.toString()=='name'){
@@ -251,6 +260,7 @@ class TaskMessages{
           return res;
         }
       });
+      return "No sender";
     });
   }
 
@@ -274,6 +284,7 @@ class TaskMessages{
             sender: values['sender'].toString(),
             status: values['status'].toString(),
             title: values['title'].toString(),
+            name: values['name'].toString(),
           );
         }
       });
