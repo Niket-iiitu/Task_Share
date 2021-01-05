@@ -12,65 +12,80 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  int taskLeft, taskInProcess, taskStall; //TODO: Global Variables
+  int taskPending, taskUnderway, taskStall; //TODO: Global Variables
   List<ListItem> dataPending = new List<ListItem>();
+  List<ListItem> dataUnderway = new List<ListItem>();
+  List<ListItem> dataStalled = new List<ListItem>();
+  List<taskData> onlineData = new List<taskData>();
+  List<int> isExpandedPending = new List<int>();
+  List<int> isExpandedUnderway = new List<int>();
+  List<int> isExpandedStalled = new List<int>();
   bool isLoaded = false;
-  List<int> isExpanded = new List<int>();
 
   getData() async {
     //TODO: Get Data
-    //isLoaded=false;
-    isExpanded = new List<int>();
-    dataPending = new List<ListItem>();
     TaskMessages taskMessages = new TaskMessages();
-    List<ListItem> pending = new List<ListItem>();
-    int left = 0, underway = 0, halt = 0;
-    List<taskData> onlineData = new List<taskData>();
-    onlineData =await taskMessages.getTask();
-    for (taskData unit in onlineData) {
-      switch (unit.getStatus()) {
+    onlineData = await taskMessages.getTask();
+    isLoaded = true;
+    dataPending = new List<ListItem>();
+    dataUnderway = new List<ListItem>();
+    dataStalled = new List<ListItem>();
+
+    int p = 0,
+        u = 0,
+        s = 0;
+
+    for (int i = 0; i < onlineData.length; i++) {
+      switch (onlineData[i].getStatus()) {
         case 'pending':
           {
-            left++;
-            isExpanded.add(left-1);
-            await taskMessages.getName(unit.getSender()).then((res){
-              pending.add(
-                  ListItem(
-                    title: unit.getTitle(),
-                    description: unit.getDescription(),
-                    senderCredential: unit.getSender(),
-                    key: unit.getKey(),
-                    isExpanded: false,
-                    senderName: res.toString(),
-                  ));
-              print("getData sender: $res");
-
-            });
+            isExpandedPending.add(p);
+            p++;
+            dataPending.add(ListItem(
+              title: onlineData[i].title,
+              description: onlineData[i].description,
+              senderCredential: onlineData[i].sender,
+              isExpanded: false,
+              key: onlineData[i].key,
+              senderName: onlineData[i].name,
+            ));
           }
           break;
         case 'underway':
           {
-            underway++;
+            isExpandedUnderway.add(u);
+            u++;
+            dataUnderway.add(ListItem(
+              title: onlineData[i].title,
+              description: onlineData[i].description,
+              senderCredential: onlineData[i].sender,
+              isExpanded: false,
+              key: onlineData[i].key,
+              senderName: onlineData[i].name,
+            ));
           }
           break;
-        case 'halt':
+        case 'stall':
           {
-            halt++;
+            isExpandedStalled.add(s);
+            s++;
+            dataStalled.add(ListItem(
+              title: onlineData[i].title,
+              description: onlineData[i].description,
+              senderCredential: onlineData[i].sender,
+              isExpanded: false,
+              key: onlineData[i].key,
+              senderName: onlineData[i].name,
+            ));
           }
           break;
       }
-
-      setState(() {
-        taskLeft = left;
-        taskInProcess = underway;
-        taskStall = halt;
-        dataPending=pending;
-      });
     }
-    print("Task Page: " + taskLeft.toString());
-    print("Task Page: " + taskInProcess.toString());
-    print("Task Page: " + taskStall.toString());
-    isLoaded=true;
+    taskPending = p;
+    taskUnderway = u;
+    taskStall = s;
+
+    print("taskPage getData $taskPending $taskUnderway $taskStall");
   }
 
   @override
@@ -105,25 +120,58 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
           ),
           body: TabBarView(
-              children: [
-                pendingList(),
-                Container(
-                  child: Text("Underway"),
-                ),
-                Container(
-                  child: Text("Halted"),
-                ),
-              ],
-            ),
+            children: [
+              FutureBuilder(
+                  future: getData(),
+                  builder: (BuildContext ctx, snapshot) =>
+                  (snapshot.connectionState == ConnectionState.waiting) ?
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ) : fragmentList(dataPending)
+              ),
+              FutureBuilder(
+                  future: getData(),
+                  builder: (BuildContext ctx, snapshot) =>
+                  (snapshot.connectionState == ConnectionState.waiting) ?
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ) : fragmentList(dataUnderway)
+              ),
+              FutureBuilder(
+                  future: getData(),
+                  builder: (BuildContext ctx, snapshot) =>
+                  (snapshot.connectionState == ConnectionState.waiting) ?
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ) : fragmentList(dataStalled)
+              ),
+            ],
+          ),
           bottomNavigationBar: BottomAppBar(
             color: Colors.black,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                bottomTile(taskLeft, Colors.purple[600], "Left"),
-                bottomTile(taskInProcess, Colors.green, "Underway"),
-                bottomTile(taskStall, Colors.red, "Stalled"),
-              ],
+            child: FutureBuilder(
+              future: getData(),
+              builder: (BuildContext ctx, snapshot) =>
+              (snapshot.connectionState == ConnectionState.waiting)
+                  ? Container()
+                  :
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  bottomTile(taskPending, Colors.purple[600], "Pending"),
+                  bottomTile(taskUnderway, Colors.green, "Underway"),
+                  bottomTile(taskStall, Colors.red, "Stalled"),
+                ],
+              ),
             ),
           )),
     );
@@ -132,7 +180,6 @@ class _TaskScreenState extends State<TaskScreen> {
   Widget bottomTile(int num, Color color, String s) {
     //TODO: Bottom Tile
     //print("bottomTile $s");
-    getData();
     return Container(
       padding: EdgeInsets.all(8.0),
       child: Column(
@@ -160,96 +207,62 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  Widget pendingList(){
-    return (dataPending.isEmpty)?Container():SingleChildScrollView(
-      //TODO: Pending fragment
-      child: (!isLoaded) ? Align(
-        alignment: Alignment.center,
-        child: Container(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
-        ),
-      )
-          : ExpansionPanelList(
-        expansionCallback: (int index, bool isExpanded) {
-          setState(() {
-            dataPending[index].isExpanded = !isExpanded;
-          });
-          print('tap ${dataPending[index].isExpanded}');
-        },
-        children:
-        isExpanded.map((index) {
-          return ExpansionPanel(
-              isExpanded: dataPending[index].getIsExpanded(),
-              headerBuilder:
-                  (BuildContext context, bool isExpanded) {
-                return ListTile(
-                  title: Text(dataPending[index].getTitle()),
-                );
-              },
-              body: ListTile(
-                dense: true,
-                onTap: (){
-                  setState(() {
-                    dataPending[index].isExpanded=!dataPending[index].getIsExpanded();
-                  });
-                },
-                title: Text(dataPending[index].getSenderName()),
-                subtitle: Text(dataPending[index].getDescription()),
-                trailing: Container(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector( //TODO: Underway a task
-                        onTap: () {
-                          dataPending.removeWhere(
-                                  (element) => dataPending[index] == element
-                          );
-                          TaskMessages taskMessages =
-                          new TaskMessages();
-                          taskMessages.updateTask(
-                              dataPending[index].getKey(),
-                              'underway',
-                              dataPending[index].getTitle(),
-                              dataPending[index].getSenderCredential());
-                        },
+  Widget fragmentList(List<ListItem> data) {
+    //TODO: Pending List Builder
+    return (data.isEmpty) ? Container() : new ListView.builder(
+        itemCount: taskPending,
+        itemBuilder: (context, i) =>
+            ExpansionTile(
+              title: Text(
+                data[i].getTitle(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 21.0,
+                ),
+              ),
+              subtitle: Text(
+                data[i].getSenderName(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 15.0,
+                ),
+              ),
+              children: [
+                Row(
+                  children: [
+                    Expanded(
                         child: Container(
-                          padding: EdgeInsets.all(5.0),
-                          child: Icon(
-                            Icons.play_arrow,
-                            color: Colors.greenAccent[400],
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            data[i].getDescription(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                            maxLines: 5,
                           ),
+                        )
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        print('tap');
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.title,
+                          color: Colors.blue,
+                          size: 20,
                         ),
                       ),
-                      GestureDetector( //TODO: Cancel Task
-                        onTap:() {
-                          setState(() {
-                            dataPending.removeWhere(
-                                    (element) => dataPending[index] == element);
-                          });
-                          TaskMessages taskMessages =
-                          new TaskMessages();
-                          taskMessages.removeTask(
-                              dataPending[index].key,
-                              dataPending[index].title,
-                              dataPending[index].senderCredential);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(5.0),
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ));
-        }).toList(),
-      ),
+                    )
+                  ],
+                )
+              ],
+            )
     );
   }
-
-
 }
