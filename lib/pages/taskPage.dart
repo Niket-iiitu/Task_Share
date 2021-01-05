@@ -114,7 +114,7 @@ class _TaskScreenState extends State<TaskScreen> {
                   text: "Underway",
                 ),
                 Tab(
-                  text: "Halted",
+                  text: "Stalled",
                 )
               ],
             ),
@@ -130,7 +130,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     child: Container(
                       child: CircularProgressIndicator(),
                     ),
-                  ) : fragmentList(dataPending)
+                  ) : fragmentList(dataPending,Colors.purple[600],'pending')
               ),
               FutureBuilder(
                   future: getData(),
@@ -141,7 +141,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     child: Container(
                       child: CircularProgressIndicator(),
                     ),
-                  ) : fragmentList(dataUnderway)
+                  ) : fragmentList(dataUnderway,Colors.green,'underway')
               ),
               FutureBuilder(
                   future: getData(),
@@ -152,7 +152,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     child: Container(
                       child: CircularProgressIndicator(),
                     ),
-                  ) : fragmentList(dataStalled)
+                  ) : fragmentList(dataStalled,Colors.red,'stall')
               ),
             ],
           ),
@@ -167,9 +167,9 @@ class _TaskScreenState extends State<TaskScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  bottomTile(taskPending, Colors.purple[600], "Pending"),
-                  bottomTile(taskUnderway, Colors.green, "Underway"),
-                  bottomTile(taskStall, Colors.red, "Stalled"),
+                  bottomTile(taskPending, Colors.purple[600], "PENDING"),
+                  bottomTile(taskUnderway, Colors.green, "UNDERWAY"),
+                  bottomTile(taskStall, Colors.red, "STALLED"),
                 ],
               ),
             ),
@@ -207,16 +207,20 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  Widget fragmentList(List<ListItem> data) {
+  Widget fragmentList(List<ListItem> data,Color color,String state) {
     //TODO: Pending List Builder
-    return (data.isEmpty) ? Container() : new ListView.builder(
+    return (data.isEmpty) ? Container() : new ListView.separated(
         itemCount: taskPending,
+        separatorBuilder: (context, index) => Divider(
+          color: color,
+          thickness: 2.5,
+        ),
         itemBuilder: (context, i) =>
             ExpansionTile(
               title: Text(
                 data[i].getTitle(),
                 style: TextStyle(
-                  color: Colors.white,
+                  color: color,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                   fontSize: 21.0,
@@ -249,6 +253,9 @@ class _TaskScreenState extends State<TaskScreen> {
                     GestureDetector(
                       onTap: () {
                         print('tap');
+                        showDialog(
+                            context: context,
+                            builder: (context) => changeStatus(data[i].getTitle(), state));
                       },
                       child: Container(
                         padding: EdgeInsets.all(8.0),
@@ -263,6 +270,43 @@ class _TaskScreenState extends State<TaskScreen> {
                 )
               ],
             )
+    );
+  }
+
+  AlertDialog changeStatus(String title,String state){ //TODO: Change Status Dialog
+    return AlertDialog(
+      backgroundColor: Colors.black54,
+      title: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.blueAccent,
+              fontWeight: FontWeight.bold,
+              fontSize: 21.0,
+            ),
+          ),
+          Text(
+            "Current State : $state",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.0,
+            ),
+          ),
+          Row(
+            children: [
+              GestureDetector(
+                child: Text('Underway')
+              ),
+              GestureDetector(
+                child: Text('Delete'),
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }
