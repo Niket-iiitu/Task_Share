@@ -113,24 +113,24 @@ class _signInState extends State<signIn> {
                           width: MediaQuery.of(context).size.width,
                         ),
                       ),
-                      SizedBox(
-                        height: 16.0,
-                      ),
-                      GestureDetector(
-                        onTap: (() {
-                          GoogleMeIn();
-                        }),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Sign In with Google",
-                            style: blackStyle(context),
-                          ),
-                          decoration: whiteButton(context),
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          width: MediaQuery.of(context).size.width,
-                        ),
-                      ),
+                      // SizedBox(
+                      //   height: 16.0,
+                      // ),
+                      // GestureDetector(
+                      //   onTap: (() {
+                      //     GoogleMeIn();
+                      //   }),
+                      //   child: Container(
+                      //     alignment: Alignment.center,
+                      //     child: Text(
+                      //       "Sign In with Google",
+                      //       style: blackStyle(context),
+                      //     ),
+                      //     decoration: whiteButton(context),
+                      //     padding: EdgeInsets.symmetric(vertical: 20),
+                      //     width: MediaQuery.of(context).size.width,
+                      //   ),
+                      // ),
                       SizedBox(
                         height: 16.0,
                       ),
