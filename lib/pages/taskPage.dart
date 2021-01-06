@@ -86,6 +86,7 @@ class _TaskScreenState extends State<TaskScreen> {
     taskStall = s;
 
     print("taskPage getData $taskPending $taskUnderway $taskStall");
+    print("taskPage getData ${dataPending.length} ${dataUnderway.length} ${dataStalled.length}");
   }
 
   @override
@@ -210,7 +211,7 @@ class _TaskScreenState extends State<TaskScreen> {
   Widget fragmentList(List<ListItem> data,Color color,String state) {
     //TODO: Pending List Builder
     return (data.isEmpty) ? Container() : new ListView.separated(
-        itemCount: taskPending,
+        itemCount: data.length,
         separatorBuilder: (context, index) => Divider(
           color: color,
           thickness: 2.5,
@@ -255,7 +256,7 @@ class _TaskScreenState extends State<TaskScreen> {
                         print('tap');
                         showDialog(
                             context: context,
-                            builder: (context) => changeStatus(data[i].getTitle(), state));
+                            builder: (context) => changeStatus(data[i].getTitle(), state, data[i].getKey(),data[i].getSenderCredential()));
                       },
                       child: Container(
                         padding: EdgeInsets.all(8.0),
@@ -273,7 +274,7 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  AlertDialog changeStatus(String title,String state){ //TODO: Change Status Dialog
+  AlertDialog changeStatus(String title,String state,String key,String credential){ //TODO: Change Status Dialog
     return AlertDialog(
       backgroundColor: Colors.black54,
       title: Column(
@@ -295,13 +296,57 @@ class _TaskScreenState extends State<TaskScreen> {
               fontSize: 18.0,
             ),
           ),
+          SizedBox(width: 30,height: 30,),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               GestureDetector(
-                child: Text('Underway')
+                onTap: (){
+                  TaskMessages taskMessages = new TaskMessages();
+                  setState(() {
+                    taskMessages.updateTask(key , 'underway', title, credential);
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text('Underway',
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic
+                  ),
+                )
               ),
               GestureDetector(
-                child: Text('Delete'),
+                onTap: (){
+                  TaskMessages taskMessages = new TaskMessages();
+                  setState(() {
+                    taskMessages.updateTask(key , 'stall', title, credential);
+                  });
+                  Navigator.of(context).pop();
+                },
+                  child: Text('Stall',
+                    style: TextStyle(
+                        color: Colors.amber,
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic
+                    ),
+                  ),
+              ),
+              GestureDetector(
+                onTap: (){
+                  TaskMessages taskMessages = new TaskMessages();
+                  setState(() {
+                    taskMessages.updateTask(key , null, title, credential);
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text('Delete',
+                  style: TextStyle(
+                      color: Colors.amber,
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic
+                  ),
+                ),
               )
             ],
           )

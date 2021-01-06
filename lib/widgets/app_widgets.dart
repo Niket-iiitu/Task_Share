@@ -173,3 +173,11 @@ TextStyle imageStyle(BuildContext context) {
     fontSize: 15.0,
   );
 }
+
+TextStyle taskStyle(BuildContext context) {
+  return TextStyle(
+    color: Colors.amberAccent,
+    fontWeight: FontWeight.bold,
+    fontSize: 15.0,
+  );
+}

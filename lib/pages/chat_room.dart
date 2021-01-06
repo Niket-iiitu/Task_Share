@@ -250,6 +250,58 @@ class _ChatAreaState extends State<ChatArea> {
               ],
             ),
           );
+        }else if(finalData[index].getType() == 'task') {
+          return (finalData[index].getSender() == 'friend')
+              ? Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 20.0,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      finalData[index].getText(),
+                      style: taskStyle(context),
+                    ),
+                  ),
+                  decoration: leftChatBox(),
+                  padding: EdgeInsets.all(12),
+                ),
+              ],
+            ),
+          )
+              : Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      finalData[index].getText(),
+                      style: taskStyle(context),
+                    ),
+                  ),
+                  decoration: rightChatBox(),
+                  padding: EdgeInsets.all(12),
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+              ],
+            ),
+          );
         } else{
           return (finalData[index].getSender() == 'friend')
               ? Container(
