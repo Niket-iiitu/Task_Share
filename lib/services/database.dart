@@ -91,6 +91,15 @@ class AccessFriends {
     print(data.length);
     return data;
   }
+
+  removeFriend(String credential) async {
+    await FirebaseDatabase.instance
+    .reference()
+    .child('friend')
+    .child(FirebaseAuth.instance.currentUser.uid.toString())
+    .child(credential)
+    .set(null);
+  }
 }
 
 class ChatListMessage {
@@ -236,6 +245,7 @@ class TaskMessages{
   }
 
   messageTask(String friendCredential,String title,String status,String dateTime) async { //TODO Message Task
+    if(status==null) status= 'deleted';
     await FirebaseDatabase.instance.reference().child('chats').child(dateTime).set({
       'sender': meCredential,
       'receiever': friendCredential,

@@ -39,6 +39,12 @@ class _ChatRoomState extends State<ChatRoom> {
                       friendCredential: credential,
                     )));
       },
+      onLongPress: (){
+        showDialog(
+          context: context,
+          builder: (context) => removeFriendDialog(credential, userName)
+        );
+      },
       child: Container(
           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           child: Container(
@@ -186,9 +192,66 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  // Widget loadingProblem() {
-  //   return getData().then(() {
-  //     return getList();
-  //   });
-  // }
+  AlertDialog removeFriendDialog(String credential,String name){
+    return AlertDialog(
+      backgroundColor: Colors.black54,
+      title: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children:[
+            Text(
+              "Remove Person",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 21.0,
+              ),
+            ),
+            Text(
+              "Do you want to remove $name ?",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+              ),
+            ),
+          ],
+      ),
+      actions: [
+        RaisedButton(
+            onPressed: (() {
+              Navigator.of(context).pop();
+            }),
+            elevation: 2.0,
+            //highlightColor: Colors.white54,
+            color: Colors.transparent,
+            child: Text(
+              "Close",
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
+            )),
+        RaisedButton(
+            onPressed: (() {
+              AccessFriends accessFriendsDialog = new AccessFriends();
+              setState(() {
+                accessFriendsDialog.removeFriend(credential);
+              });
+              Navigator.of(context).pop();
+            }),
+            elevation: 2.0,
+            //highlightColor: Colors.white54,
+            color: Colors.transparent,
+            child: Text(
+              "OK",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontStyle: FontStyle.italic,
+                fontSize: 18.0,
+              ),
+            ))
+      ],
+    );
+  }
 }
